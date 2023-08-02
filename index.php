@@ -1,3 +1,41 @@
+<?php
+function pickupmachineLanguage($string){
+    //$originalString = "This;is;a;sample;string;with;multiple;semicolons.";
+$searchString = ":"; // 検索する文字列
+$length = 12; // 取り出す文字数
+
+$startPosition = 0; // 検索開始位置
+
+$vector = "";
+
+while (($position = strpos($string, $searchString, $startPosition)) !== false) {
+    // セミコロンが見つかった場合
+    $extractedString = substr($string, $position + 1, $length);
+    echo "aaa $extractedString";
+    $vector .= $extractedString;
+    echo $extractedString . PHP_EOL;
+    
+    $startPosition = $position + 1; // 次の検索を開始する位置を更新
+}
+$int = 13;
+$outputlang = substr($vector,$int);
+$vector = preg_replace('/\s+/', '', $outputlang);
+echo $vector;
+return $vector;
+}
+
+function hexToBinary($hexString) {
+    echo "hexstring $hexString end";
+    $binaryString = '';
+    $length = strlen($hexString);
+    echo "len $length";
+    for ($i = 0; $i < $length; $i++) {
+        $binaryString .= str_pad(base_convert($hexString[$i], 16, 2), 4, '0', STR_PAD_LEFT);
+        $binaryString .= " ";
+    }
+    return $binaryString;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +43,41 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="/predictions.js"></script>
 </head>
+<style>
+    body {
+        background-color: #333333;
+        color: #00FF00;
+    }
+    .explain {
+        text-align:center;
+    }
+    
+textarea {
+    background-color: rgb(249, 251, 254);
+    margin-top: 24px;
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(186, 198, 211);
+    border-radius: 3px;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    height: 200px;
+    font-family: inherit;
+
+}
+
+#predictions {
+position:absolute;
+cursor: pointer;
+}
+.prediction:hover {
+color:red;
+}
+</style>
 <body>
 <div class="explain">
     <h1>detailMachine | yuma4869</h1>
@@ -16,27 +88,54 @@
 
 <div class="inputCode">
     <h2>C言語のコードを入力してください</h2>
-    <form action="index.php">
-        <textarea name="code" id="code" cols="30" rows="10">#include<stdio.h></textarea>
+    <form method="post" action="index.php">
+    <div class="position">
+    <textarea id="inputCode" oninput="updatePredictions()" onkeydown="checkKeyPress(event)"></textarea>
+    <div id="predictions"></div>
+    </div>
         <input type="submit" value="送信" name="submit">
         <input type="hidden" name="form_submitted" value="<?php echo isset($_POST['form_submitted']) ? 'true' : 'false'; ?>">
     </form>
+</body>
+</html>
 </div>
 </body>
 </html>
 <?php
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
-        if (isset($_POST["submit"]) && isset($_POST['form_submitted'])){
+        if (isset($_POST["submit"])){
             $file_path = "example.c";
-            $fp = fopen($file_path,'w');
-            fwrite($fp,$_POST["code"]);
-            fclose($fp);
-            shell_exec("gcc -g -o example $file_path");
-            shell_exec("gdb example");
-            shell_exec("break main");
-            shell_exec("run");
-            $machineLanguage16 = shell_exec('x/10i $pc');
-            echo $machineLanguage16;
+            $code = $_POST["code"];
+            $fp = fopen($file_path, 'w');
+            if ($fp !== false) {
+                fwrite($fp, $code);
+                fclose($fp);
+                echo "ファイルにコードを保存しました。";
+            } else {
+                echo "ファイルをオープンできませんでした。";
+            }
+            $gdb_output = shell_exec('gdb -q -batch -x command.gdb example');
+
+            // 改行コードをHTMLの改行タグに変換して表示
+            echo nl2br(htmlspecialchars($gdb_output));
+            $file_path = "binary.s";
+            $code = $gdb_output;
+            $fp = fopen($file_path, 'w');
+            if ($fp !== false) {
+                fwrite($fp, $code);
+                fclose($fp);
+                echo "ファイルにコードを保存しました。";
+            } else {
+                echo "ファイルをオープンできませんでした。";
+            }
+            shell_exec("gcc -nostartfiles -o binary binary.s");
+            $objdump = shell_exec("objdump -d example");
+            echo $objdump;
+            echo "ahahaha";
+            $sixteenlang = pickupmachineLanguage($objdump);
+            echo "sixteentest $sixteenlang";
+            $intsixteen = str_replace(":","",$sixteenlang);
+            echo "inttest $intsixteen";
+            $machineLanguage = hexToBinary($intsixteen);
+            echo "tesst $machineLanguage finish";
         }
-    }
 ?>
