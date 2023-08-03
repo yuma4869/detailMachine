@@ -1,14 +1,14 @@
         // 予測変換の辞書データ
         const predictionData = {
             "#include": "#include",
+            "int":"int",
             "int main": "int main() {\n\n    return 0;\n}",
-            "printf": 'printf("Hello, World!\\n");',
-            "scanf": 'scanf("%d", &variable);',
-            "if": "if (condition) {\n\n}",
+            "if": "if () {\n\n}",
+            "printf": 'printf("");',
+            "scanf": 'scanf();',
             "else": "else {\n\n}",
             "for": "for (int i = 0; i < count; i++) {\n\n}",
             "while": "while (condition) {\n\n}",
-            "int":"int",
             "char":"char",
         };
         
@@ -35,14 +35,14 @@
                     const predictionsElement = document.getElementById("predictions");
                     if (predictions.length > 0) {
                         const predictionList = predictions.map((prediction, index) => `<div class="prediction${index === 0 ? " selected" : ""}" onclick="applyPrediction('${prediction}')">${prediction}</div>`).join("");
-                        predictionsElement.innerHTML = "Predictions: " + predictionList;
+                        predictionsElement.innerHTML = predictionList;
                 
                         // 入力欄のカーソル位置を取得
-                        const cursorPosition = getCursorPosition(inputCodeElement);
+                        var position = getCaretPosition(inputCodeElement); 
+                        predictionsElement.style.left = position.x + 'px';
+                        predictionsElement.style.top = (position.y) + 'px';;
                         // 予測変換の候補を入力欄のカーソル位置の少し下に表示
-                        console.log(cursorPosition.top);
-                        predictionsElement.style.top = `${cursorPosition.top + 30}px`;
-                        predictionsElement.style.left = `${cursorPosition.left + 10}px`;
+
                     } else {
                         predictionsElement.innerText = "";
                     }
@@ -50,23 +50,58 @@
                 
                 // 入力欄のカーソル位置を取得する関数
 // 入力欄のカーソル位置を取得する関数
-function getCursorPosition(input) {
-    if (!input.firstChild) {
-        input.appendChild(document.createTextNode(""));
-    }
+function createCopy(textArea) {
+        var copy = document.createElement('div');
+        copy.textContent = textArea.value;
+        var style = getComputedStyle(textArea);
+        [
+         'fontFamily',
+         'fontSize',
+         'fontWeight',
+         'wordWrap', 
+         'whiteSpace',
+         'borderLeftWidth',
+         'borderTopWidth',
+         'borderRightWidth',
+         'borderBottomWidth',
+        ].forEach(function(key) {
+          copy.style[key] = style[key];
+        });
+        copy.style.overflow = 'auto';
+        copy.style.width = textArea.offsetWidth + 'px';
+        copy.style.height = textArea.offsetHeight + 'px';
+        copy.style.position = 'absolute';
+        copy.style.left = textArea.offsetLeft + 'px';
+        copy.style.top = textArea.offsetTop + 'px';
+        document.body.appendChild(copy);
+        return copy;
+      }
+      
+      function getCaretPosition(textArea) {
+        var start = textArea.selectionStart;
+        var end = textArea.selectionEnd;
+        var copy = createCopy(textArea);
+        var range = document.createRange();
+        range.setStart(copy.firstChild, start);
+        range.setEnd(copy.firstChild, end);
+        var selection = document.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        var rect = range.getBoundingClientRect();
+        document.body.removeChild(copy);
+        textArea.selectionStart = start;
+        textArea.selectionEnd = end;
+        textArea.focus();
+        const textareaRect = textArea.getBoundingClientRect();
+        const textareaTop = textareaRect.top;
+        console.log(textareaTop);
+        const textareaLeft = textareaRect.left;
+        return {
+          x: rect.left - textArea.scrollLeft,
+          y: rect.top + 30
+        };
+      }
 
-    const range = document.createRange();
-    range.setStart(input.firstChild, input.selectionEnd);
-    range.setEnd(input.firstChild, input.selectionEnd);
-
-    const rect = range.getBoundingClientRect();
-    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-    const scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
-    return {
-        top: rect.top + scrollTop,
-        left: rect.left + scrollLeft
-    };
-}
 
 
                 

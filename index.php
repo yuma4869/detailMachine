@@ -54,17 +54,17 @@ function hexToBinary($hexString) {
         text-align:center;
     }
     
-textarea {
+    textarea {
+        overflow-y: auto;
     background-color: rgb(249, 251, 254);
     margin-top: 24px;
     display: block;
     width: 100%;
-    padding: 16px;
+    padding:16px;
     background-color: rgb(255, 255, 255);
     border: 1px solid rgb(186, 198, 211);
     border-radius: 3px;
     font-size: 0.75rem;
-    line-height: 1.5;
     height: 200px;
     font-family: inherit;
 
@@ -73,6 +73,14 @@ textarea {
 #predictions {
 position:absolute;
 cursor: pointer;
+
+}
+.prediction {
+    font-size:0.7em;
+    color: #444;
+    background-color:#f8f4e6;
+    border-top:1px solid black;
+    width:auto;
 }
 .prediction:hover {
 color:red;
@@ -90,8 +98,8 @@ color:red;
     <h2>C言語のコードを入力してください</h2>
     <form method="post" action="index.php">
     <div class="position">
-    <textarea id="inputCode" oninput="updatePredictions()" onkeydown="checkKeyPress(event)"></textarea>
-    <div id="predictions"></div>
+    <textarea name="code" id="inputCode" oninput="updatePredictions()" onkeydown="checkKeyPress(event)"></textarea>
+    <div id="predictions" style="height: 1.2em;position: absolute;"></div>
     </div>
         <input type="submit" value="送信" name="submit">
         <input type="hidden" name="form_submitted" value="<?php echo isset($_POST['form_submitted']) ? 'true' : 'false'; ?>">
@@ -105,6 +113,7 @@ color:red;
         if (isset($_POST["submit"])){
             $file_path = "example.c";
             $code = $_POST["code"];
+            echo $code;
             $fp = fopen($file_path, 'w');
             if ($fp !== false) {
                 fwrite($fp, $code);
@@ -113,9 +122,11 @@ color:red;
             } else {
                 echo "ファイルをオープンできませんでした。";
             }
+            shell_exec("gcc -g -o example example.c");
             $gdb_output = shell_exec('gdb -q -batch -x command.gdb example');
 
             // 改行コードをHTMLの改行タグに変換して表示
+            echo "aaaaa $gdb_output end";
             echo nl2br(htmlspecialchars($gdb_output));
             $file_path = "binary.s";
             $code = $gdb_output;

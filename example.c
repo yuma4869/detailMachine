@@ -1,5 +1,3 @@
-#include<stdio.h>
+#include <stdio.h>
 
-int main(void){
-printf("hello");
-}
+int main() {  int variable; scanf("%d", &variable); printf("%d",variable); }
