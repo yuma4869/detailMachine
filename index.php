@@ -4,7 +4,7 @@ function pickupmachineLanguage($string){
 $searchString = ":"; // 検索する文字列
 $length = 12; // 取り出す文字数
 
-$startPosition = 0; // 検索開始位置
+$startPosition = 0; // 検索開始位置 
 
 $vector = "";
 
@@ -59,7 +59,7 @@ function hexToBinary($hexString) {
     background-color: rgb(249, 251, 254);
     margin-top: 24px;
     display: block;
-    width: 100%;
+    width: 50%;
     padding:16px;
     background-color: rgb(255, 255, 255);
     border: 1px solid rgb(186, 198, 211);
@@ -69,7 +69,16 @@ function hexToBinary($hexString) {
     font-family: inherit;
 
 }
-
+#result {
+    width:50%;
+    background-color: black;
+}
+.log {
+    color:white;
+    text-align: center;
+    font-family: monospace;
+    line-height:15px;
+}
 #predictions {
 position:absolute;
 cursor: pointer;
@@ -85,6 +94,9 @@ cursor: pointer;
 .prediction:hover {
 color:red;
 }
+.test {
+    color:red;
+}
 </style>
 <body>
 <div class="explain">
@@ -97,30 +109,29 @@ color:red;
 <div class="inputCode">
     <h2>C言語のコードを入力してください</h2>
     <form method="post" action="index.php">
-    <div class="position">
+    <div class="flex" style="display: flex;">
     <textarea name="code" id="inputCode" oninput="updatePredictions()" onkeydown="checkKeyPress(event)"></textarea>
-    <div id="predictions" style="height: 1.2em;position: absolute;"></div>
+    <div id="result" class="log" style="color:00FF00"><?php echo $machineLanguage ?></div>
     </div>
+    <div id="predictions" style="height: 1.2em;position: absolute;"></div>
         <input type="submit" value="送信" name="submit">
         <input type="hidden" name="form_submitted" value="<?php echo isset($_POST['form_submitted']) ? 'true' : 'false'; ?>">
     </form>
 </body>
 </html>
 </div>
-</body>
-</html>
+<div class="log">
 <?php
         if (isset($_POST["submit"])){
             $file_path = "example.c";
             $code = $_POST["code"];
-            echo $code;
             $fp = fopen($file_path, 'w');
             if ($fp !== false) {
                 fwrite($fp, $code);
                 fclose($fp);
-                echo "ファイルにコードを保存しました。";
+                echo "<div class='test'>ファイルにコードを保存しました。</div>";
             } else {
-                echo "ファイルをオープンできませんでした。";
+                echo "<div class='test'>ファイルをオープンできませんでした。</div>";
             }
             shell_exec("gcc -g -o example example.c");
             $gdb_output = shell_exec('gdb -q -batch -x command.gdb example');
@@ -143,10 +154,13 @@ color:red;
             echo $objdump;
             echo "ahahaha";
             $sixteenlang = pickupmachineLanguage($objdump);
-            echo "sixteentest $sixteenlang";
+            echo "$sixteenlang";
             $intsixteen = str_replace(":","",$sixteenlang);
-            echo "inttest $intsixteen";
+            echo "$intsixteen";
             $machineLanguage = hexToBinary($intsixteen);
-            echo "tesst $machineLanguage finish";
+            
         }
 ?>
+</div>
+</body>
+</html>

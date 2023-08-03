@@ -2,8 +2,8 @@
         const predictionData = {
             "#include": "#include",
             "int":"int",
-            "int main": "int main() {\n\n    return 0;\n}",
-            "if": "if () {\n\n}",
+            "main": "int main() {return 0;}",
+            "if": "if () {}",
             "printf": 'printf("");',
             "scanf": 'scanf();',
             "else": "else {\n\n}",
