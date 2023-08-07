@@ -118,7 +118,7 @@ color:red;
 </div>
 
 <div class="inputCode">
-    <h2>C言語のコードを入力してください</h2>
+    <h2>C言語のコードを入力してください <strong>tabを押すと補完が使えます。!の補完はテンプレートです</strong></h2>
     <p>コンパイルエラーが出ない正しいコードで入力してください</p>
     <form method="post" action="index.php">
     <div class="flex" style="display: flex;">
