@@ -1,11 +1,12 @@
         // 予測変換の辞書データ
         const predictionData = {
+            "!":'#include&lt;stdio.h&gt;\n\nint main(void){\n\n}',
             "#include": "#include",
             "int":"int",
-            "main": "int main() {return 0;}",
             "if": "if () {}",
             "printf": 'printf("");',
             "scanf": 'scanf();',
+            "stdio": 'stdio.h',
             "else": "else {\n\n}",
             "for": "for (int i = 0; i < count; i++) {\n\n}",
             "while": "while (condition) {\n\n}",
